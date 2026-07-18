@@ -732,7 +732,7 @@
     .info-strip {
       background: linear-gradient(135deg, #5c0b0d 0%, #991316 55%, #b01619 100%);
       padding: 0;
-      overflow: hidden;
+      /* overflow: hidden; Removed to allow dropdowns */
     }
 
     .info-strip-inner {
@@ -758,6 +758,85 @@
 
     .info-item:hover {
       background: rgba(255, 255, 255, 0.04);
+    }
+
+    /* Location Dropdown */
+    .location-trigger {
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .location-dropdown {
+      position: absolute;
+      bottom: calc(100% + 5px);
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      width: 220px;
+      background: var(--white);
+      border: 1px solid var(--gray-300);
+      border-radius: 12px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+      z-index: 200;
+      text-align: left;
+    }
+    
+    .location-trigger.open .location-dropdown {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+    
+    .location-trigger .chevron {
+      font-size: 8px;
+      margin-left: 4px;
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+    
+    .location-trigger.open .chevron {
+      transform: rotate(180deg);
+    }
+    
+    .location-dropdown-header {
+      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.9);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    
+    .location-dropdown-item {
+      display: block;
+      padding: 12px 16px;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      transition: background 0.15s;
+    }
+    
+    .location-dropdown-item:hover {
+      background: var(--red-pale);
+    }
+    
+    .location-dropdown-item:last-child {
+      border-bottom: none;
+    }
+    
+    .location-dropdown-item .dropdown-item-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 2px;
+    }
+    
+    .location-dropdown-item .dropdown-item-sub {
+      font-size: 11.5px;
+      color: var(--gray-500);
     }
 
     .info-icon-wrap {
@@ -2175,11 +2254,26 @@
           <div class="info-value">Telkom University Jakarta</div>
         </div>
       </a>
-      <div class="info-item">
+      <div class="info-item location-trigger" id="location-trigger" onclick="toggleLocationDropdown()">
         <div class="info-icon-wrap">📍</div>
         <div class="info-text">
-          <div class="info-label">Lokasi</div>
-          <div class="info-value">Jl. Minangkabau Barat No.50, Jaksel</div>
+          <div class="info-label" style="display:flex; align-items:center;">Lokasi <span class="chevron">▼</span></div>
+          <div class="info-value">Pilih Kampus Tel-U</div>
+        </div>
+        <div class="location-dropdown" id="location-dropdown">
+          <div class="location-dropdown-header">Pilih Lokasi Kampus</div>
+          <a href="https://jakarta.telkomuniversity.ac.id/kampus-daan-mogot/" target="_blank" class="location-dropdown-item">
+            <div class="dropdown-item-name">Kampus A</div>
+            <div class="dropdown-item-sub">Daan Mogot</div>
+          </a>
+          <a href="https://jakarta.telkomuniversity.ac.id/kampus-halimun/" target="_blank" class="location-dropdown-item">
+            <div class="dropdown-item-name">Kampus B</div>
+            <div class="dropdown-item-sub">Halimun</div>
+          </a>
+          <a href="https://jakarta.telkomuniversity.ac.id/kampus-minangkabau/" target="_blank" class="location-dropdown-item">
+            <div class="dropdown-item-name">Kampus C</div>
+            <div class="dropdown-item-sub">Minangkabau</div>
+          </a>
         </div>
       </div>
       <div class="info-item">
@@ -2693,11 +2787,20 @@
       if (trigger && !trigger.contains(e.target)) {
         trigger.classList.remove('open');
       }
+      const locTrigger = document.getElementById('location-trigger');
+      if (locTrigger && !locTrigger.contains(e.target)) {
+        locTrigger.classList.remove('open');
+      }
     });
 
     /* ── Dropdown ──────────────────────────────────────────────── */
     function toggleLoginDropdown() {
       const t = document.getElementById('login-trigger');
+      t.classList.toggle('open');
+    }
+
+    function toggleLocationDropdown() {
+      const t = document.getElementById('location-trigger');
       t.classList.toggle('open');
     }
 
