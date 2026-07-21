@@ -19,21 +19,24 @@ const DEFAULT_DATA = {
       id: 'u2', email: 'budi@tuj.ac.id', password: 'mhs123',
       role: 'mahasiswa', name: 'Budi Santoso',
       nim: '1101210001', nip: null,
-      kelas: 'TI-46-01', kelompok: 'A',
+      kelas: 'TI-46-01', kelompok: null,
+      peminatan: 'Delta', ipk: 3.8, skillRole: 'Data Engineer',
       createdAt: '2025-01-10'
     },
     {
       id: 'u3', email: 'sari@tuj.ac.id', password: 'mhs123',
       role: 'mahasiswa', name: 'Sari Dewi',
       nim: '1101210002', nip: null,
-      kelas: 'TI-46-01', kelompok: 'A',
+      kelas: 'TI-46-01', kelompok: null,
+      peminatan: 'Delta', ipk: 3.5, skillRole: 'Machine Learning',
       createdAt: '2025-01-10'
     },
     {
       id: 'u4', email: 'rizki@tuj.ac.id', password: 'mhs123',
       role: 'mahasiswa', name: 'Rizki Pratama',
       nim: '1101210003', nip: null,
-      kelas: 'TI-46-02', kelompok: 'B',
+      kelas: 'TI-46-02', kelompok: null,
+      peminatan: 'Sage', ipk: 3.2, skillRole: 'Frontend Developer',
       createdAt: '2025-01-10'
     },
     {
@@ -64,10 +67,45 @@ const DEFAULT_DATA = {
       id: 'u9', email: 'ahmad@tuj.ac.id', password: 'mhs123',
       role: 'mahasiswa', name: 'Ahmad Fauzi',
       nim: '1101210004', nip: null,
-      kelas: 'TI-46-01', kelompok: 'A',
+      kelas: 'TI-46-01', kelompok: null,
+      peminatan: 'Sage', ipk: 3.9, skillRole: 'Backend Developer',
+      createdAt: '2025-01-10'
+    },
+    {
+      id: 'u10', email: 'citra@tuj.ac.id', password: 'mhs123',
+      role: 'mahasiswa', name: 'Citra Kirana',
+      nim: '1101210005', nip: null,
+      kelas: 'TI-46-01', kelompok: null,
+      peminatan: 'Delta', ipk: 3.1, skillRole: 'Data Visualization',
+      createdAt: '2025-01-10'
+    },
+    {
+      id: 'u11', email: 'donny@tuj.ac.id', password: 'mhs123',
+      role: 'mahasiswa', name: 'Donny Kusuma',
+      nim: '1101210006', nip: null,
+      kelas: 'TI-46-02', kelompok: null,
+      peminatan: 'Sage', ipk: 3.4, skillRole: 'System Analyst',
+      createdAt: '2025-01-10'
+    },
+    {
+      id: 'u12', email: 'eka@tuj.ac.id', password: 'mhs123',
+      role: 'mahasiswa', name: 'Eka Putri',
+      nim: '1101210007', nip: null,
+      kelas: 'TI-46-02', kelompok: null,
+      peminatan: 'Delta', ipk: 3.6, skillRole: 'Data Engineer',
+      createdAt: '2025-01-10'
+    },
+    {
+      id: 'u13', email: 'fajar@tuj.ac.id', password: 'mhs123',
+      role: 'mahasiswa', name: 'Fajar Nugraha',
+      nim: '1101210008', nip: null,
+      kelas: 'TI-46-01', kelompok: null,
+      peminatan: 'Sage', ipk: 3.7, skillRole: 'Frontend Developer',
       createdAt: '2025-01-10'
     }
   ],
+
+  kelompokData: [],
 
   assignments: [
     { id: 'as1', mahasiswaId: 'u2', dosenPembimbingId: 'u5', dosenPengujiId: 'u7' },

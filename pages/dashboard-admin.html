@@ -33,6 +33,10 @@
         <span class="nav-icon">🏠</span>
         <span>Ringkasan</span>
       </div>
+      <div class="nav-item" onclick="switchTab('pembagian-kelompok')" id="nav-pembagian-kelompok">
+        <span class="nav-icon">👥</span>
+        <span>Pembagian Kelompok</span>
+      </div>
       <div class="nav-item" onclick="switchTab('assign-penguji')" id="nav-assign-penguji">
         <span class="nav-icon">📋</span>
         <span>Assign Dosen Penguji</span>
@@ -93,6 +97,52 @@
           <div class="card" id="card-penguji-progress">
             <div class="card-header"><div class="card-title">📊 Progress Penilaian</div></div>
             <div class="card-body" id="penguji-progress-body"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ TAB: PEMBAGIAN KELOMPOK ═══ -->
+      <div id="tab-pembagian-kelompok" class="hidden fade-in">
+        <div class="page-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div class="page-header-title">Pembagian Kelompok</div>
+            <div class="page-header-subtitle">Kelola pembagian kelompok mahasiswa berdasarkan skill-balanced randomization.</div>
+          </div>
+          <div>
+            <button class="btn btn-primary" onclick="generateKelompokAcak()">⚙️ Generate Kelompok</button>
+          </div>
+        </div>
+
+        <!-- Mahasiswa Belum Berkelompok -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <div class="card-title">Mahasiswa Belum Berkelompok</div>
+            <div class="card-subtitle">Data profil keahlian ditarik dari hasil kuesioner mahasiswa.</div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr><th>NIM</th><th>Nama</th><th>Peminatan</th><th>IPK</th><th>Skill Role</th></tr>
+                </thead>
+                <tbody id="belum-berkelompok-tbody">
+                  <!-- JS Render -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Daftar Kelompok Terbentuk -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Kelompok Terbentuk</div>
+            <div class="card-subtitle">Hasil randomisasi berdasarkan keahlian dan IPK.</div>
+          </div>
+          <div class="card-body">
+            <div id="kelompok-terbentuk-container" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+              <!-- JS Render -->
+            </div>
           </div>
         </div>
       </div>
@@ -369,9 +419,10 @@
 <script>
   const currentUser = Auth.requireAuth(['admin']);
 
-  const tabsList = ['overview','assign-penguji','assign-pembimbing','kriteria-penilaian','peer-review','pengguna'];
+  const tabsList = ['overview','pembagian-kelompok','assign-penguji','assign-pembimbing','kriteria-penilaian','peer-review','pengguna'];
   const tabTitles = {
     'overview': 'Ringkasan',
+    'pembagian-kelompok': 'Pembagian Kelompok',
     'assign-penguji': 'Assign Dosen Penguji',
     'assign-pembimbing': 'Assign Dosen Pembimbing',
     'kriteria-penilaian': 'Kriteria Penilaian',
@@ -408,11 +459,130 @@
 
   function loadAll() {
     loadOverview();
+    loadPembagianKelompok();
     loadAssignPenguji();
     loadAssignPembimbing();
     loadKriteriaPenilaian();
     loadKriteriaPR();
     renderUserTable();
+  }
+
+  // ── PEMBAGIAN KELOMPOK ───────────────────────────────────────────────────
+  function loadPembagianKelompok() {
+    const mhsList = DataService.getMahasiswaList();
+    const belumKelompok = mhsList.filter(m => !m.kelompok);
+    const groups = DB.get('kelompokData') || [];
+
+    const tbody = document.getElementById('belum-berkelompok-tbody');
+    if (tbody) {
+      tbody.innerHTML = '';
+      if (belumKelompok.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Semua mahasiswa sudah mendapatkan kelompok.</td></tr>`;
+      } else {
+        belumKelompok.forEach(m => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${m.nim}</td>
+              <td>${m.name}</td>
+              <td><span class="badge ${m.peminatan === 'Delta' ? 'badge-primary' : 'badge-success'}">${m.peminatan || '-'}</span></td>
+              <td>${m.ipk || '-'}</td>
+              <td>${m.skillRole || '-'}</td>
+            </tr>
+          `;
+        });
+      }
+    }
+
+    const container = document.getElementById('kelompok-terbentuk-container');
+    if (container) {
+      container.innerHTML = '';
+      if (groups.length === 0) {
+        container.innerHTML = `<div style="color:var(--gray-500); padding:20px 0;">Belum ada kelompok yang terbentuk. Silakan klik tombol Generate.</div>`;
+      } else {
+        groups.forEach(g => {
+          const members = mhsList.filter(m => m.kelompok === g.id);
+          let membersHTML = members.map(m => `
+            <div style="font-size:12.5px; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+              <div>• ${m.name}</div>
+              <div style="font-size:10px; color:var(--gray-500); background:var(--gray-100); padding:2px 6px; border-radius:4px;">${m.skillRole || '-'}</div>
+            </div>
+          `).join('');
+
+          container.innerHTML += `
+            <div style="border:1px solid var(--gray-300); border-radius:12px; padding:16px; background:var(--white);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--gray-200); padding-bottom:8px;">
+                <div style="font-weight:700; color:var(--clr-primary); font-size:14px;">${g.nama}</div>
+                <div class="badge ${g.peminatan === 'Delta' ? 'badge-primary' : 'badge-success'}">${g.peminatan}</div>
+              </div>
+              <div>${membersHTML}</div>
+            </div>
+          `;
+        });
+      }
+    }
+  }
+
+  function generateKelompokAcak() {
+    if (!confirm('Apakah Anda yakin ingin men-generate kelompok secara acak (Skill-Balanced) untuk mahasiswa yang belum berkelompok?')) return;
+
+    let mhsList = DB.get('users');
+    let belumKelompok = mhsList.filter(m => m.role === 'mahasiswa' && !m.kelompok);
+    if (belumKelompok.length === 0) {
+      alert('Tidak ada mahasiswa yang perlu dibagi.');
+      return;
+    }
+
+    let delta = belumKelompok.filter(m => m.peminatan === 'Delta');
+    let sage = belumKelompok.filter(m => m.peminatan === 'Sage');
+    
+    let groups = DB.get('kelompokData') || [];
+    let groupCounter = groups.length + 1;
+
+    function buildGroups(students, peminatanName) {
+      students.sort((a, b) => (b.ipk || 0) - (a.ipk || 0));
+      const GROUP_SIZE = 3;
+      
+      while (students.length > 0) {
+        let currentGroup = [];
+        let groupId = 'G' + groupCounter;
+        
+        let leader = students.shift();
+        currentGroup.push(leader);
+        
+        while (currentGroup.length < GROUP_SIZE && students.length > 0) {
+          let neededSkills = currentGroup.map(m => m.skillRole);
+          let foundIdx = students.findIndex(m => !neededSkills.includes(m.skillRole));
+          
+          if (foundIdx !== -1) {
+            currentGroup.push(students.splice(foundIdx, 1)[0]);
+          } else {
+            currentGroup.push(students.shift());
+          }
+        }
+        
+        groups.push({
+          id: groupId,
+          nama: 'Kelompok ' + groupCounter + ' (' + peminatanName + ')',
+          peminatan: peminatanName
+        });
+
+        currentGroup.forEach(s => {
+          let uIndex = mhsList.findIndex(u => u.id === s.id);
+          if (uIndex !== -1) mhsList[uIndex].kelompok = groupId;
+        });
+
+        groupCounter++;
+      }
+    }
+
+    buildGroups(delta, 'Delta');
+    buildGroups(sage, 'Sage');
+
+    DB.set('users', mhsList);
+    DB.set('kelompokData', groups);
+    
+    loadPembagianKelompok();
+    alert('Generate kelompok berhasil!');
   }
 
   // ── OVERVIEW ──────────────────────────────────────────────────────────────
